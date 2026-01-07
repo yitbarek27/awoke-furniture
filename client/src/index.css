@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-marquee {
+    display: inline-block;
+    animation: marquee 12s linear infinite;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply antialiased text-slate-800 !important;
+    background-image: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn {
+    @apply px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md;
+}
+
+.btn-primary {
+    @apply bg-primary text-white hover:bg-primary-light hover:shadow-lg;
+}
+
+.btn-secondary {
+    @apply bg-secondary text-white hover:bg-orange-600;
+}
+
+.btn-light {
+    @apply bg-white text-primary border border-gray-200 hover:bg-gray-50;
+}
+
+/* Custom Animations - Manual Definition to ensure it works without Tailwind config reload */
+@keyframes slowZoom {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+.animate-slow-zoom {
+    animation: slowZoom 20s linear infinite alternate;
+}
