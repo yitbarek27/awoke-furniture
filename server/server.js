@@ -12,6 +12,12 @@ const OrderItem = require('./models/OrderItem');
 
 dotenv.config();
 
+// Fallback for JWT_SECRET if not specified in environment
+if (!process.env.JWT_SECRET) {
+    console.warn('Warning: JWT_SECRET not defined in environment. Using default fallback.');
+    process.env.JWT_SECRET = 'awoke_furniture_secret_key_12345';
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
