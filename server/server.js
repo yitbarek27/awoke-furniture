@@ -133,9 +133,9 @@ async function initDatabase() {
 
 
 // Routes
-app.get('/', (req, res) => {
-    res.send('Awoke Furniture API is running');
-});
+// app.get('/', (req, res) => {
+//     res.send('Awoke Furniture API is running');
+// });
 
 // Ensure uploads directory exists
 const fs = require('fs');
