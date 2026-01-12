@@ -36,7 +36,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
         return;
     } else {
         const order = await Order.create({
-            UserId: req.user.id,
+            UserId: req.user ? req.user.id : null,
             shippingAddress: shippingAddress, // Will be stringified JSON
             paymentMethod,
             paymentScreenshotUrl,

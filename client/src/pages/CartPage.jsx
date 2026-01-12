@@ -10,11 +10,7 @@ const CartPage = () => {
     const navigate = useNavigate();
 
     const checkoutHandler = () => {
-        if (!user) {
-            navigate('/login?redirect=shipping');
-        } else {
-            navigate('/shipping');
-        }
+        navigate('/shipping');
     };
 
     const total = cartItems.reduce((acc, item) => acc + Number(item.qty) * Number(item.price), 0);

@@ -27,23 +27,13 @@ const ShippingPage = () => {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        if (!user) {
-            navigate('/login?redirect=shipping');
-            return;
-        }
-
         if (!cartItems || cartItems.length === 0) {
             navigate('/cart');
         }
-    }, [user, cartItems, navigate]);
+    }, [cartItems, navigate]);
 
     const submitHandler = async (e) => {
         e.preventDefault();
-
-        if (!user) {
-            navigate('/login?redirect=shipping');
-            return;
-        }
 
         if (!cartItems || cartItems.length === 0) {
             alert('Your cart is empty');
@@ -91,9 +81,11 @@ const ShippingPage = () => {
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${user.token}`,
                 },
             };
+            if (user && user.token) {
+                config.headers.Authorization = `Bearer ${user.token}`;
+            }
 
             const itemsPrice = cartItems.reduce((acc, item) => acc + Number(item.price) * Number(item.qty), 0);
 

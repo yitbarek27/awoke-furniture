@@ -35,6 +35,26 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 });
 
+const optionalProtect = asyncHandler(async (req, res, next) => {
+    let token;
+
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await User.findByPk(decoded.id, {
+                attributes: { exclude: ['password'] }
+            });
+        } catch (error) {
+            // Check if it's a critical error or just expiry
+        }
+    }
+    next();
+});
+
 const admin = (req, res, next) => {
     console.log('Backend: admin middleware - checking role for user:', req.user ? `${req.user.name} (${req.user.role})` : 'No User');
     if (req.user && req.user.role === 'admin') {
@@ -55,4 +75,4 @@ const sales = (req, res, next) => {
     }
 };
 
-module.exports = { protect, admin, sales };
+module.exports = { protect, optionalProtect, admin, sales };
