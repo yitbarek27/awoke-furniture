@@ -17,8 +17,19 @@ const LoginPage = () => {
             setError('Please select login type.');
             return;
         }
+
+        const cleanName = name.trim();
+        const cleanPassword = password.trim();
+
+        if (!cleanName || !cleanPassword) {
+            setError('Please fill in all fields.');
+            return;
+        }
+
         try {
-            const loggedInUser = await login(name, password);
+            console.log(`Attempting login for: ${cleanName} as ${loginType}`);
+            const loggedInUser = await login(cleanName, cleanPassword);
+            
             if (loginType === 'admin' && loggedInUser.role === 'admin') {
                 navigate('/admin/dashboard');
             } else if (loginType === 'seller' && loggedInUser.role === 'sales') {
@@ -27,10 +38,11 @@ const LoginPage = () => {
                 navigate('/customer/dashboard');
             } else {
                 logout();
-                setError(`Access Denied: Invalid credentials for ${loginType} login.`);
+                setError(`Access Denied: Invalid role for ${loginType} login.`);
             }
         } catch (err) {
-            setError(err);
+            console.error('Login error:', err);
+            setError(err.toString());
         }
     };
 
@@ -93,6 +105,9 @@ const LoginPage = () => {
                         <input
                             type="text"
                             required
+                            autoCorrect="off"
+                            autoComplete="off"
+                            autoCapitalize="none"
                             className="w-full px-4 py-2 mt-1 border rounded-md focus:ring-secondary focus:border-secondary transition-all"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -114,6 +129,16 @@ const LoginPage = () => {
                     >
                         {loginType === 'seller' ? 'Seller Login' : loginType === 'admin' ? 'Admin Login' : 'Login'}
                     </button>
+                    {loginType === 'customer' && (
+                        <div className="text-center mt-4">
+                            <p className="text-sm text-gray-600">
+                                Don't have an account?{' '}
+                                <Link to="/register" className="text-secondary hover:underline font-bold">
+                                    Register here
+                                </Link>
+                            </p>
+                        </div>
+                    )}
                 </form>
                 {/* <div className="text-center">
                     <p className="text-sm text-gray-600">
