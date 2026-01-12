@@ -12,6 +12,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
         orderItems,
         shippingAddress,
         paymentMethod,
+        paymentScreenshotUrl,
         itemsPrice,
         taxPrice,
         shippingPrice,
@@ -22,11 +23,23 @@ const addOrderItems = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('No order items');
         return;
+    }
+
+    if (!paymentMethod) {
+        res.status(400);
+        throw new Error('Payment method is required');
+    }
+
+    if (!paymentScreenshotUrl) {
+        res.status(400);
+        throw new Error('Payment screenshot is required');
+        return;
     } else {
         const order = await Order.create({
             UserId: req.user.id,
             shippingAddress: shippingAddress, // Will be stringified JSON
             paymentMethod,
+            paymentScreenshotUrl,
             itemsPrice,
             taxPrice,
             shippingPrice,
@@ -105,9 +118,45 @@ const getOrders = asyncHandler(async (req, res) => {
     res.json(orders.map(o => ({ ...o.toJSON(), _id: o.id })));
 });
 
+// @desc    Approve an order
+// @route   PUT /api/orders/:id/approve
+// @access  Private/Admin
+const approveOrder = asyncHandler(async (req, res) => {
+    const order = await Order.findByPk(req.params.id);
+
+    if (!order) {
+        res.status(404);
+        throw new Error('Order not found');
+    }
+
+    order.status = 'Approved';
+    const updated = await order.save();
+    res.json({ ...updated.toJSON(), _id: updated.id });
+});
+
+// @desc    Delete an order
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+const deleteOrder = asyncHandler(async (req, res) => {
+    const order = await Order.findByPk(req.params.id);
+
+    if (!order) {
+        res.status(404);
+        throw new Error('Order not found');
+    }
+
+    // Remove order items first to avoid FK issues
+    await OrderItem.destroy({ where: { OrderId: order.id } });
+    await order.destroy();
+
+    res.json({ message: 'Order removed' });
+});
+
 module.exports = {
     addOrderItems,
     getOrderById,
     getMyOrders,
     getOrders,
+    approveOrder,
+    deleteOrder,
 };

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { getImageUrl } from '../utils/imageUtils';
+import { formatETB } from '../utils/currency';
 
 const ProductListPage = () => {
     const [products, setProducts] = useState([]);
@@ -146,7 +147,7 @@ const ProductListPage = () => {
                                             </span>
                                         </td>
                                         <td className="px-8 py-5 font-bold text-primary">
-                                            ${product.price.toLocaleString()}
+                                            {formatETB(product.price)}
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2">

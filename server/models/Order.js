@@ -10,6 +10,10 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    paymentScreenshotUrl: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     itemsPrice: {
         type: DataTypes.FLOAT,
         defaultValue: 0.0

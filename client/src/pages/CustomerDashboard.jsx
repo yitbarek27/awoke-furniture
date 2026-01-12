@@ -1,9 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 const CustomerDashboard = () => {
     const { cartItems } = useCart();
     const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
+    const navigate = useNavigate();
+
+    const handleBrowseCatalog = () => {
+        // Navigate to HomePage and scroll to the catalog section (list of all products)
+        navigate('/', { state: { scrollTo: 'catalog' } });
+    };
 
     return (
         <div className="space-y-10 pb-12">
@@ -16,7 +22,11 @@ const CustomerDashboard = () => {
             {/* Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* 1. View Products / Catalog */}
-                <a href="/#new-arrivals" className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 group hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <button
+                    type="button"
+                    onClick={handleBrowseCatalog}
+                    className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 group hover:-translate-y-1 transition-all duration-300 relative overflow-hidden text-left"
+                >
                     <div className="absolute top-0 right-0 p-8 opacity-5 text-9xl font-bold text-secondary group-hover:opacity-10 transition-opacity">
                         1
                     </div>
@@ -26,9 +36,11 @@ const CustomerDashboard = () => {
                         </div>
                         <h3 className="text-2xl font-bold text-primary mb-2">Browse Catalog</h3>
                         <p className="text-gray-500 mb-6">See types of available products with their prices. Explore our premium MDF collection.</p>
-                        <span className="text-secondary font-bold flex items-center gap-2">View Products →</span>
+                        <span className="text-secondary font-bold flex items-center gap-2">
+                            View Products →
+                        </span>
                     </div>
-                </a>
+                </button>
 
                 {/* 2. Make Decision / Cart */}
                 <Link to="/cart" className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 group hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">

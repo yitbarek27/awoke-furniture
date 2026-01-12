@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
+import { formatETB } from '../utils/currency';
 
 const SellerDashboard = () => {
     const { user } = useAuth();
@@ -29,7 +30,7 @@ const SellerDashboard = () => {
         { label: 'My Sales today', value: '4', icon: '📈', color: 'bg-blue-500' },
         { label: 'Pending Orders', value: '12', icon: '⏳', color: 'bg-amber-500' },
         { label: 'Completed Deliveries', value: '85', icon: '✅', color: 'bg-emerald-500' },
-        { label: 'My Commission', value: '$420', icon: '💰', color: 'bg-purple-500' },
+        { label: 'My Commission', value: formatETB(420), icon: '💰', color: 'bg-purple-500' },
     ];
 
     const handleCheckCatalog = () => {
@@ -105,7 +106,7 @@ const SellerDashboard = () => {
                                             <p className="text-gray-600 text-sm italic">MDF Wardrobe x1</p>
                                         </td>
                                         <td className="py-4">
-                                            <p className="font-bold text-primary">$450.00</p>
+                                            <p className="font-bold text-primary">{formatETB(450)}</p>
                                         </td>
                                         <td className="py-4 text-right">
                                             <span className="bg-amber-100 text-amber-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Pending Delivery</span>

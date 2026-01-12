@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getImageUrl } from '../utils/imageUtils';
+import { formatETB } from '../utils/currency';
 
 const SupportPage = () => {
     const contacts = [
@@ -43,28 +44,33 @@ const SupportPage = () => {
         }
     ];
 
-    const [showProducts, setShowProducts] = useState(false);
+    const [showProducts, setShowProducts] = useState(true);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleViewProducts = async () => {
-        if (showProducts && products.length) {
-            // already loaded; just toggle visibility
-            setShowProducts(false);
-            return;
-        }
+    const fetchProducts = async () => {
         try {
             setLoading(true);
             setError('');
             const { data } = await axios.get('/api/products');
-            setProducts(data);
-            setShowProducts(true);
+            const list = Array.isArray(data) ? data : [];
+            // Show newest added first (backend uses numeric ids mapped to _id)
+            const sorted = list.slice().sort((a, b) => Number(b?._id ?? 0) - Number(a?._id ?? 0));
+            setProducts(sorted);
         } catch (err) {
             setError(err.response?.data?.message || err.message);
         } finally {
             setLoading(false);
         }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const handleToggleProducts = () => {
+        setShowProducts((prev) => !prev);
     };
 
     return (
@@ -102,12 +108,21 @@ const SupportPage = () => {
                         <h2 className="text-xl font-heading font-bold text-primary">Browse Products</h2>
                         <p className="text-gray-500 text-sm">See available items right here without leaving support.</p>
                     </div>
-                    <button
-                        onClick={handleViewProducts}
-                        className="btn btn-secondary px-6 py-3 text-white"
-                    >
-                        {showProducts ? 'Hide Products' : 'View Products'}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={fetchProducts}
+                            disabled={loading}
+                            className="btn btn-light px-5 py-3"
+                        >
+                            {loading ? 'Refreshing…' : 'Refresh'}
+                        </button>
+                        <button
+                            onClick={handleToggleProducts}
+                            className="btn btn-secondary px-6 py-3 text-white"
+                        >
+                            {showProducts ? 'Hide Products' : 'Show Products'}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Product List */}
@@ -136,7 +151,7 @@ const SupportPage = () => {
                                         <Link to={`/product/${p._id}`} className="font-bold text-primary hover:text-secondary">
                                             {p.name}
                                         </Link>
-                                        <div className="text-gray-600 text-sm">${p.price?.toLocaleString?.() || p.price}</div>
+                                        <div className="text-gray-600 text-sm">{formatETB(p.price)}</div>
                                         <div className="text-xs text-gray-400">{p.category}</div>
                                     </div>
                                 </div>

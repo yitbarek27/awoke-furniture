@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { formatETB } from '../utils/currency';
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
@@ -125,10 +126,10 @@ const AdminDashboard = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-all">
                     <div>
                         <p className="text-gray-500 text-sm font-bold uppercase tracking-wider">Total Sales</p>
-                        <h3 className="text-3xl font-bold text-primary mt-1">${stats.revenue.toLocaleString()}</h3>
+                        <h3 className="text-3xl font-bold text-primary mt-1">{formatETB(stats.revenue)}</h3>
                     </div>
                     <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
-                        $
+                        Br
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-all">

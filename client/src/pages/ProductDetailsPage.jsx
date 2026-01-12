@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getImageUrl } from '../utils/imageUtils';
 import { useCart } from '../context/CartContext';
+import { formatETB } from '../utils/currency';
 
 const ProductDetailsPage = () => {
     const { id } = useParams();
@@ -49,13 +50,13 @@ const ProductDetailsPage = () => {
 
                 <div className="space-y-4">
                     <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-                    <p className="text-2xl font-semibold text-secondary">${product.price}</p>
+                    <p className="text-2xl font-semibold text-secondary">{formatETB(product.price)}</p>
                     <p className="text-gray-600 border-t border-b py-4 whitespace-pre-wrap">{product.description}</p>
 
                     <div className="bg-white p-6 rounded-lg shadow-sm border">
                         <div className="flex justify-between mb-2">
                             <span>Price:</span>
-                            <span className="font-bold">${product.price}</span>
+                            <span className="font-bold">{formatETB(product.price)}</span>
                         </div>
                         <div className="flex justify-between mb-4">
                             <span>Status:</span>

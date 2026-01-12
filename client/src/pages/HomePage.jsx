@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
+import { formatETB } from '../utils/currency';
 
 const HomePage = () => {
     const [allProducts, setAllProducts] = useState([]);
@@ -12,6 +13,8 @@ const HomePage = () => {
     const [showNewArrivals, setShowNewArrivals] = useState(false);
     const { keyword } = useParams();
     const { user } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -26,6 +29,29 @@ const HomePage = () => {
         };
         fetchProducts();
     }, []);
+
+    useEffect(() => {
+        const shouldScrollToCatalog =
+            location?.state?.scrollTo === 'catalog' || location?.hash === '#catalog';
+
+        if (!shouldScrollToCatalog) return;
+
+        // Wait a tick so the DOM is painted
+        setTimeout(() => {
+            const catalogSection = document.getElementById('catalog');
+            if (catalogSection) {
+                catalogSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 0);
+
+        // Clear one-time navigation state to avoid re-scrolling
+        if (location?.state?.scrollTo === 'catalog') {
+            navigate(`${location.pathname}${location.search}${location.hash}`, {
+                replace: true,
+                state: null,
+            });
+        }
+    }, [location, navigate]);
 
     useEffect(() => {
         let filtered = allProducts;
@@ -294,7 +320,7 @@ const HomePage = () => {
                                         <h3 className="text-xl font-bold text-primary hover:text-secondary transition-colors truncate mb-2">{product.name}</h3>
                                     </Link>
                                     <div className="flex justify-between items-center border-t border-gray-50 pt-3 mt-2">
-                                        <span className="text-2xl font-bold text-slate-800">${product.price}</span>
+                                        <span className="text-2xl font-bold text-slate-800">{formatETB(product.price)}</span>
                                         <div className="flex text-yellow-500 text-sm">
                                             {'★'.repeat(5)}
                                         </div>

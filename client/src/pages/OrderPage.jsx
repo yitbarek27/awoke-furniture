@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { formatETB } from '../utils/currency';
+import { getImageUrl } from '../utils/imageUtils';
 
 const OrderPage = () => {
     const { id } = useParams();
@@ -37,20 +39,42 @@ const OrderPage = () => {
 
     return (
         <div className="container mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-6 text-primary">Order {order._id}</h1>
+            <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+                <h1 className="text-2xl font-bold text-primary">Order {order._id}</h1>
+                {order.status === 'Approved' ? (
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Approved</span>
+                ) : (
+                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">Pending Approval</span>
+                )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6">
                     <div className="bg-white p-6 rounded shadow">
                         <h2 className="text-xl font-semibold mb-4 text-primary">Shipping</h2>
-                        <p><strong>Name:</strong> {order.user.name}</p>
+                        <p><strong>Name:</strong> {order?.shippingAddress?.fullName || order?.user?.name}</p>
                         <p><strong>Email:</strong> <a href={`mailto:${order.user.email}`} className="text-blue-600">{order.user.email}</a></p>
-                        <p><strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.postalCode}, {order.shippingAddress.country}</p>
+                        {order?.shippingAddress?.address && (
+                            <p><strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.postalCode}, {order.shippingAddress.country}</p>
+                        )}
                         {order.isDelivered ? <div className="mt-2 bg-green-100 text-green-700 p-2 rounded">Delivered on {order.deliveredAt}</div> : <div className="mt-2 bg-red-100 text-red-700 p-2 rounded">Not Delivered</div>}
                     </div>
 
                     <div className="bg-white p-6 rounded shadow">
                         <h2 className="text-xl font-semibold mb-4 text-primary">Payment Method</h2>
                         <p><strong>Method:</strong> {order.paymentMethod}</p>
+                        {order.paymentScreenshotUrl && (
+                            <div className="mt-4">
+                                <p className="font-semibold text-primary mb-2">Payment Screenshot</p>
+                                <a href={order.paymentScreenshotUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                                    View uploaded screenshot
+                                </a>
+                                <img
+                                    src={order.paymentScreenshotUrl}
+                                    alt="Payment screenshot"
+                                    className="mt-3 w-full max-h-72 object-contain rounded border"
+                                />
+                            </div>
+                        )}
                         {order.isPaid ? <div className="mt-2 bg-green-100 text-green-700 p-2 rounded">Paid on {order.paidAt}</div> : <div className="mt-2 bg-red-100 text-red-700 p-2 rounded">Not Paid</div>}
                     </div>
 
@@ -65,7 +89,7 @@ const OrderPage = () => {
                                             <Link to={`/product/${item.product}`} className="hover:text-secondary">{item.name}</Link>
                                         </div>
                                         <div>
-                                            {item.qty} x ${item.price} = ${item.qty * item.price}
+                                            {item.qty} x {formatETB(item.price)} = {formatETB(item.qty * item.price)}
                                         </div>
                                     </div>
                                 ))}
@@ -78,19 +102,19 @@ const OrderPage = () => {
                     <h2 className="text-xl font-bold mb-4">Order Summary</h2>
                     <div className="flex justify-between py-2 border-b">
                         <span>Items</span>
-                        <span>${order.itemsPrice}</span>
+                        <span>{formatETB(order.itemsPrice)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b">
                         <span>Shipping</span>
-                        <span>${order.shippingPrice}</span>
+                        <span>{formatETB(order.shippingPrice)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b">
                         <span>Tax</span>
-                        <span>${order.taxPrice}</span>
+                        <span>{formatETB(order.taxPrice)}</span>
                     </div>
                     <div className="flex justify-between py-2 font-bold text-lg">
                         <span>Total</span>
-                        <span>${order.totalPrice}</span>
+                        <span>{formatETB(order.totalPrice)}</span>
                     </div>
                 </div>
             </div>

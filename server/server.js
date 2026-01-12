@@ -27,9 +27,109 @@ Order.hasMany(OrderItem);
 OrderItem.belongsTo(Order);
 
 // Database Sync
-sequelize.sync({ force: false }) // set force: true to reset DB
-    .then(() => console.log('SQLite Database Connected & Synced'))
-    .catch(err => console.error('Database Error:', err));
+async function repairSqliteOrdersUserForeignKey() {
+    try {
+        if (sequelize.getDialect() !== 'sqlite') return;
+
+        const [fkRows] = await sequelize.query("PRAGMA foreign_key_list('Orders')");
+        const fkList = Array.isArray(fkRows) ? fkRows : fkRows ? [fkRows] : [];
+        const hasBrokenFk = fkList.some((r) => r.table === 'Users_old');
+        if (!hasBrokenFk) return;
+
+        console.warn('Detected broken foreign key: Orders.UserId -> Users_old. Repairing SQLite schema...');
+
+        await sequelize.query('PRAGMA foreign_keys=OFF');
+        await sequelize.query('BEGIN TRANSACTION');
+
+        await sequelize.query(`
+            CREATE TABLE IF NOT EXISTS "Orders_new" (
+                "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                "shippingAddress" JSON NOT NULL,
+                "paymentMethod" VARCHAR(255) NOT NULL,
+                "paymentScreenshotUrl" VARCHAR(255),
+                "itemsPrice" FLOAT DEFAULT '0',
+                "taxPrice" FLOAT DEFAULT '0',
+                "shippingPrice" FLOAT DEFAULT '0',
+                "totalPrice" FLOAT DEFAULT '0',
+                "isPaid" TINYINT(1) DEFAULT 0,
+                "paidAt" DATETIME,
+                "isDelivered" TINYINT(1) DEFAULT 0,
+                "deliveredAt" DATETIME,
+                "status" VARCHAR(255) DEFAULT 'Pending',
+                "createdAt" DATETIME NOT NULL,
+                "updatedAt" DATETIME NOT NULL,
+                "UserId" INTEGER REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+            );
+        `);
+
+        await sequelize.query(`
+            INSERT INTO "Orders_new" (
+                "id",
+                "shippingAddress",
+                "paymentMethod",
+                "paymentScreenshotUrl",
+                "itemsPrice",
+                "taxPrice",
+                "shippingPrice",
+                "totalPrice",
+                "isPaid",
+                "paidAt",
+                "isDelivered",
+                "deliveredAt",
+                "status",
+                "createdAt",
+                "updatedAt",
+                "UserId"
+            )
+            SELECT
+                "id",
+                "shippingAddress",
+                "paymentMethod",
+                NULL as "paymentScreenshotUrl",
+                "itemsPrice",
+                "taxPrice",
+                "shippingPrice",
+                "totalPrice",
+                "isPaid",
+                "paidAt",
+                "isDelivered",
+                "deliveredAt",
+                "status",
+                "createdAt",
+                "updatedAt",
+                "UserId"
+            FROM "Orders";
+        `);
+
+        await sequelize.query('DROP TABLE "Orders"');
+        await sequelize.query('ALTER TABLE "Orders_new" RENAME TO "Orders"');
+
+        await sequelize.query('COMMIT');
+        await sequelize.query('PRAGMA foreign_keys=ON');
+
+        console.warn('SQLite schema repair complete.');
+    } catch (err) {
+        try {
+            await sequelize.query('ROLLBACK');
+        } catch {
+            // ignore
+        }
+        try {
+            await sequelize.query('PRAGMA foreign_keys=ON');
+        } catch {
+            // ignore
+        }
+        console.error('SQLite schema repair failed:', err);
+        throw err;
+    }
+}
+
+async function initDatabase() {
+    await sequelize.authenticate();
+    await repairSqliteOrdersUserForeignKey();
+    await sequelize.sync({ force: false }); // set force: true to reset DB
+    console.log('SQLite Database Connected & Synced');
+}
 
 
 // Routes
@@ -77,7 +177,14 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Start Server (only after DB is ready)
+initDatabase()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Database Error:', err);
+        process.exit(1);
+    });

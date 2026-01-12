@@ -13,6 +13,7 @@ import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
 import ShippingPage from './pages/ShippingPage';
 import OrderPage from './pages/OrderPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 import OrderListPage from './pages/OrderListPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage';
 import SupportPage from './pages/SupportPage';
@@ -35,6 +36,7 @@ function App() {
                                 <Route path="/product/:id" element={<ProductDetailsPage />} />
                                 <Route path="/cart" element={<CartPage />} />
                                 <Route path="/shipping" element={<ShippingPage />} />
+                                <Route path="/order-success/:id" element={<OrderSuccessPage />} />
                                 <Route path="/order/:id" element={<OrderPage />} />
                                 <Route path="/login" element={<LoginPage />} />
                                 <Route path="/customer/dashboard" element={<CustomerDashboard />} />

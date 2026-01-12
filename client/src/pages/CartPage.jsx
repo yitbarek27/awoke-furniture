@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
+import { formatETB } from '../utils/currency';
 
 const CartPage = () => {
     const { cartItems, removeFromCart } = useCart();
@@ -16,7 +17,7 @@ const CartPage = () => {
         }
     };
 
-    const total = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2);
+    const total = cartItems.reduce((acc, item) => acc + Number(item.qty) * Number(item.price), 0);
 
     return (
         <div className="max-w-6xl mx-auto py-10 px-4">
@@ -40,7 +41,7 @@ const CartPage = () => {
                                 />
                                 <div className="flex-1 text-center sm:text-left">
                                     <Link to={`/product/${item.product}`} className="text-xl font-bold text-primary hover:text-secondary transition-colors">{item.name}</Link>
-                                    <p className="text-secondary font-bold text-lg mt-1">${item.price}</p>
+                                    <p className="text-secondary font-bold text-lg mt-1">{formatETB(item.price)}</p>
                                     <span className="inline-block mt-2 px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full uppercase font-bold tracking-wider">
                                         Quantity: {item.qty}
                                     </span>
@@ -68,11 +69,11 @@ const CartPage = () => {
                             </div>
                             <div className="flex justify-between text-gray-500">
                                 <span>Subtotal:</span>
-                                <span>${total}</span>
+                                <span>{formatETB(total)}</span>
                             </div>
                             <div className="flex justify-between border-t pt-4">
                                 <span className="text-xl font-bold text-primary">Estimated Total:</span>
-                                <span className="text-2xl font-bold text-secondary">${total}</span>
+                                <span className="text-2xl font-bold text-secondary">{formatETB(total)}</span>
                             </div>
                         </div>
                         <button
