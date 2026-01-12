@@ -71,8 +71,8 @@ const LoginPage = () => {
                     <button
                         onClick={() => {
                             setLoginType('admin');
-                            setName('Awoke');
-                            setPassword('12345');
+                            setName('');
+                            setPassword('');
                         }}
                         className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg text-sm ${loginType === 'admin'
                                 ? 'bg-gray-800 text-white'
@@ -85,9 +85,6 @@ const LoginPage = () => {
                 {error && (
                     <div className="p-3 text-sm text-red-500 bg-red-100 rounded border border-red-200">
                         {error}
-                        {error.includes('credentials') && loginType === 'admin' && (
-                            <p className="mt-2 text-xs text-red-700 font-bold italic underline">Tip: Default Admin is 'Awoke' with password '12345'</p>
-                        )}
                     </div>
                 )}
                 <form onSubmit={handleSubmit} className="space-y-4">
