@@ -23,6 +23,8 @@ const LoginPage = () => {
                 navigate('/admin/dashboard');
             } else if (loginType === 'seller' && loggedInUser.role === 'sales') {
                 navigate('/seller/dashboard');
+            } else if (loginType === 'customer') {
+                navigate('/customer/dashboard');
             } else {
                 logout();
                 setError(`Access Denied: Invalid credentials for ${loginType} login.`);
@@ -41,13 +43,30 @@ const LoginPage = () => {
                 </div>
                 <div className="flex gap-4">
                     <button
-                        onClick={() => setLoginType('seller')}
-                        className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg ${loginType === 'seller'
+                        onClick={() => {
+                            setLoginType('customer');
+                            setName('');
+                            setPassword('');
+                        }}
+                        className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg text-sm ${loginType === 'customer'
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                    >
+                        Customer
+                    </button>
+                    <button
+                        onClick={() => {
+                            setLoginType('seller');
+                            setName('');
+                            setPassword('');
+                        }}
+                        className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg text-sm ${loginType === 'seller'
                                 ? 'bg-secondary text-white'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                     >
-                        Login as Seller
+                        Seller
                     </button>
                     <button
                         onClick={() => {
@@ -55,12 +74,12 @@ const LoginPage = () => {
                             setName('Awoke');
                             setPassword('12345');
                         }}
-                        className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg ${loginType === 'admin'
-                                ? 'bg-primary text-white'
+                        className={`flex-1 px-4 py-2 font-bold rounded-md transition-all shadow-lg text-sm ${loginType === 'admin'
+                                ? 'bg-gray-800 text-white'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                     >
-                        Login as Admin
+                        Admin
                     </button>
                 </div>
                 {error && (

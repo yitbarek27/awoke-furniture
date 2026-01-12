@@ -78,7 +78,7 @@ const OrderListPage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-6 text-primary">Admin Orders</h1>
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white shadow-md rounded-lg overflow-hidden overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>

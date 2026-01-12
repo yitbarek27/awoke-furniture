@@ -103,7 +103,7 @@ const SupportPage = () => {
 
             {/* View Products CTA */}
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div>
                         <h2 className="text-xl font-heading font-bold text-primary">Browse Products</h2>
                         <p className="text-gray-500 text-sm">See available items right here without leaving support.</p>
