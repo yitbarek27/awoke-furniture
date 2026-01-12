@@ -129,6 +129,33 @@ async function initDatabase() {
     await repairSqliteOrdersUserForeignKey();
     await sequelize.sync({ force: false }); // set force: true to reset DB
     console.log('SQLite Database Connected & Synced');
+
+    // Create Admin User if not exists (Critical for deployments where DB resets)
+    const User = require('./models/User');
+    const adminEmail = 'admin@awoke.com';
+    const adminExists = await User.findOne({ where: { email: adminEmail } });
+
+    if (!adminExists) {
+        await User.create({
+            name: 'Awoke',
+            email: adminEmail,
+            password: '12345',
+            role: 'admin',
+        });
+        console.log('Admin User Created (Name: Awoke, Pwd: 12345)');
+    } else {
+         // Ensure password/role is correct even if user exists (self-healing)
+         const needsUpdate = adminExists.name !== 'Awoke' || adminExists.role !== 'admin';
+         if(needsUpdate) {
+             adminExists.name = 'Awoke';
+             adminExists.role = 'admin';
+             await adminExists.save();
+             console.log('Admin User Repaired');
+         }
+         // Note: We don't overwrite password here to allow admin to change it, 
+         // unless we want to strictly force it for this demo/support context. 
+         // For now, let's leave password alone if exists.
+    }
 }
 
 
